@@ -1,0 +1,19 @@
+{
+  "name": "neuronet",
+  "version": "0.0.1",
+  "description": "Experiments with neuro nets and deep learning",
+  "main": "index.ts",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikolayMakhonin/neuronet.git"
+  },
+  "author": "Nikolay Makhonin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NikolayMakhonin/neuronet/issues"
+  },
+  "homepage": "https://github.com/NikolayMakhonin/neuronet#readme"
+}
