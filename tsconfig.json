@@ -1,9 +1,8 @@
 {
 	"include": [
-		"**/*.ts"
 	],
     "exclude": [
-        "node_modules/*",
+        "node_modules/*"
     ],
     "module": "es6",
     "compilerOptions": {
@@ -18,7 +17,7 @@
             ]
 		},
         "sourceMap": true,
-		"target": "ES2020",
-		"lib": ["dom", "es2020"]
+		"target": "ES2019",
+		"lib": ["dom", "ES2019"]
     }
 }

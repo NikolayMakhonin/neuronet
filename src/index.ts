@@ -1,5 +1,3 @@
-function test(val: string) {
-	console.log(val)
-}
+import {_test} from "./module";
 
-test('Worked')
+_test('Worked')
