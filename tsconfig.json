@@ -1,0 +1,24 @@
+{
+	"include": [
+		"**/*.ts"
+	],
+    "exclude": [
+        "node_modules/*",
+    ],
+    "module": "es6",
+    "compilerOptions": {
+        "outDir": "./.bin",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "baseUrl": "./",
+		"paths": {
+            "src/*": [
+                "src/*"
+            ]
+		},
+        "sourceMap": true,
+		"target": "ES2020",
+		"lib": ["dom", "es2020"]
+    }
+}
