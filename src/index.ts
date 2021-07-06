@@ -1,3 +1,3 @@
-import {_test} from "./module";
+import {_test} from "./neuron/neuron";
 
 _test('Worked')
