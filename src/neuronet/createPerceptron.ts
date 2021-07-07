@@ -6,17 +6,17 @@ export function createPerceptron<TInput extends TNeuroNetInput = TNeuroNetInput>
 	input,
 	countLayers,
 	getLayerSize,
-	getNeuronFunc,
 	getLinkWeight,
+	getNeuronFunc,
 }: {
 	input: TInput,
 	countLayers: number,
 	getLayerSize: (countLayers: number, layerIndex: number) => number,
+	getLinkWeight: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number, countLinks: number, linkIndex: number) => number,
 	getNeuronFunc: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number) => INeuronFunc,
-	getLinkWeight: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number, countLinks: number, linkIndex: number) => INeuronFunc,
 }): TNeuroNet<TInput> {
 	const layers: Neuron[][] = []
-	let prevLayer = input
+	let prevLayer: (Neuron|number)[] = input
 	for (let layerIndex = 0; layerIndex < countLayers; layerIndex++) {
 		const countNeurons = getLayerSize(countLayers, layerIndex)
 		const layer: Neuron[] = []
@@ -29,6 +29,7 @@ export function createPerceptron<TInput extends TNeuroNetInput = TNeuroNetInput>
 			const neuron = new Neuron(neuronFunc, prevLayer, weights)
 			layer.push(neuron)
 		}
+		prevLayer = layer
 		layers.push(layer)
 	}
 	return {

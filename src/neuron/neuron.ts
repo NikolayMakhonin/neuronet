@@ -52,7 +52,6 @@ export class Neuron {
 
 	clear_dE_Dw(): void {
 		for (let i = 0, len = this.weights.length; i < len; i++) {
-			// const weight = this.weights[i]
 			this.dE_dw[i] = 0
 			const input = this.inputs[i]
 			if (typeof input !== 'number') {
