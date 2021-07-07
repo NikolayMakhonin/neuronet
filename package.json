@@ -23,6 +23,7 @@
 		"typescript": "^4.3.5"
 	},
 	"devDependencies": {
+		"@types/assert": "^1.5.5",
 		"@types/mocha": "^8.2.2",
 		"assert": "^2.0.0",
 		"mocha": "^9.0.2"

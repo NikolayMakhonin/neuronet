@@ -1,8 +1,6 @@
 import {INeuronFunc} from "./contracts";
 
-export const funcs: {
-	[name: string]: INeuronFunc
-} = {
+export const funcs = {
 	x: {
 		func: o => o,
 		derivative: () => 1,
