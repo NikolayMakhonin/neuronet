@@ -3,7 +3,7 @@ export function cycle({
 	maxIterations,
 	maxTime,
 }: {
-	func: (iteration: number, elapsedTime: number, last: boolean) => boolean,
+	func: (iteration: number, elapsedTime: number, last: boolean) => boolean|void,
 	maxIterations?: number,
 	maxTime?: number,
 }) {
@@ -23,7 +23,7 @@ export function cycle({
 		let end: boolean = false
 		while (!end) {
 			end ||= endTime && now >= endTime || maxIterations && iteration >= maxIterations - 1
-			end ||= func(iteration, now - startTime, end)
+			end ||= !!func(iteration, now - startTime, end)
 			iteration++
 		}
 	} finally {

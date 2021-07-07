@@ -5,11 +5,11 @@ export const funcs: {
 } = {
 	x: {
 		func: o => o,
-		derivative: o => 1,
+		derivative: () => 1,
 	},
 	sign: {
 		func: o => o >= 0 ? 1 : -1,
-		derivative: o => Infinity,
+		derivative: o => o === 0 ? Number.POSITIVE_INFINITY : 0,
 	},
 	ReLU: {
 		func: o => o >= 0 ? o : 0,
@@ -22,8 +22,8 @@ export const funcs: {
 		},
 	},
 	'1': {
-		func: o => 1,
-		derivative: o => 0,
+		func: () => 1,
+		derivative: () => 0,
 	},
 	exp: {
 		func: o => Math.E ** o,
