@@ -11,44 +11,51 @@ describe('NeuroNetProcessor', function() {
 		maxIterations,
 		func,
 		maxError,
+		testsCount,
 	}: {
 		name: string,
 		learningRate: number,
 		maxIterations: number,
 		func: TNeuronFunc,
 		maxError: number,
+		testsCount: number,
 	}) {
-		const input = [0]
-		const neuron = new Neuron(func, input, [0])
-		const neuroNet = new NeuroNetProcessor({
-			neuroNet: {
-				input,
-				layers: [[neuron]],
-			},
-			expectedFunc(input, output) {
-				output[0] = func.func(input[0])
-			},
-		})
+		let lastError
 
-		neuroNet.learn({
-			nextInputValue(inputIndex, inputCount) {
-				return Math.random() * 10 - 5
-			},
-			learningRate,
-			maxIterations,
-		})
+		for (let i = 0; i < testsCount; i++) {
+			const input = [0]
+			const neuron = new Neuron(func, input, [0])
+			const neuroNet = new NeuroNetProcessor({
+				neuroNet: {
+					input,
+					layers: [[neuron]],
+				},
+				expectedFunc(input, output) {
+					output[0] = func.func(input[0])
+				},
+			})
 
-		const calcErrorIterations = 1000
-		const error = neuroNet.calcError({
-			nextInputValue(inputIndex, inputCount, iteration) {
-				return (iteration / calcErrorIterations) * 10 - 5
-			},
-			maxIterations: calcErrorIterations,
-		})
+			neuroNet.learn({
+				nextInputValue(inputIndex, inputCount) {
+					return Math.random() * 10 - 5
+				},
+				learningRate,
+				maxIterations,
+			})
 
-		console.log(`Single neuron (${name}); error=${error}`)
+			const calcErrorIterations = 1000
+			const error = neuroNet.calcError({
+				nextInputValue(inputIndex, inputCount, iteration) {
+					return (iteration / calcErrorIterations) * 10 - 5
+				},
+				maxIterations: calcErrorIterations,
+			})
+			lastError = error
 
-		assert.ok(error < maxError)
+			assert.ok(error < maxError, `Single neuron (${name}); error=${error}`)
+		}
+
+		console.log(`Single neuron (${name}); error=${lastError}`)
 	}
 
 	it('single neuron sigmoid', function() {
@@ -58,6 +65,7 @@ describe('NeuroNetProcessor', function() {
 			maxIterations: 150,
 			func: funcs.sigmoid,
 			maxError: 0.0001,
+			testsCount: 1000,
 		})
 	})
 
@@ -65,9 +73,21 @@ describe('NeuroNetProcessor', function() {
 		testSingleNeuron({
 			name: 'ReLU',
 			learningRate: 0.1,
-			maxIterations: 400,
+			maxIterations: 500,
 			func: funcs.ReLU,
 			maxError: 0.0001,
+			testsCount: 1000,
+		})
+	})
+
+	it('single neuron sin', function() {
+		testSingleNeuron({
+			name: 'sin',
+			learningRate: 0.01,
+			maxIterations: 30000,
+			func: funcs.sin,
+			maxError: 0.0001,
+			testsCount: 1000,
 		})
 	})
 })
