@@ -25,7 +25,7 @@ export class NeuroNetProcessor {
 		maxIterations,
 		maxTime,
 	}: {
-		nextInputValue: (inputIndex: number, inputCount: number) => number,
+		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
 		learningRate: number,
 		maxIterations?: number,
 		maxTime?: number,
@@ -45,7 +45,7 @@ export class NeuroNetProcessor {
 		maxIterations,
 		maxTime,
 	}: {
-		nextInputValue: (inputIndex: number, inputCount: number) => number,
+		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
 		maxIterations?: number,
 		maxTime?: number,
 	}) {
@@ -68,7 +68,7 @@ function _learnNeuroNet({
 	maxTime,
 }: {
 	neuroNet: TNeuroNet<TInput>,
-	nextInputValue: (inputIndex: number, inputCount: number) => number,
+	nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
 	expectedFunc: (input: TInput, output: TOutput) => void,
 	learningRate?: number,
 	maxIterations?: number,
@@ -83,12 +83,12 @@ function _learnNeuroNet({
 	learn<TInput, TOutput>({
 		maxIterations,
 		maxTime,
-		nextInput(input) {
+		nextInput(input, iteration) {
 			if (!input) {
 				input = neuroNet.input
 			}
 			for (let i = 0, len = input.length; i < len; i++) {
-				input[i] = nextInputValue(i, len)
+				input[i] = nextInputValue(i, len, iteration)
 			}
 			return input
 		},
@@ -116,11 +116,12 @@ function _learnNeuroNet({
 				errorCount++
 
 				if (learningRate) {
-					const dE_do_j = 2 * (actual - expected) * learningRate
+					const dE_do_j = 2 * (actual - expected) * 1
 					neuron.clear_dE_Dw()
 					const sum_sqr_dE_Dw = neuron.calc_dE_Dw(dE_do_j)
-
-					neuron.changeWeights(learningRate)
+					if (sum_sqr_dE_Dw !== 0) {
+						neuron.changeWeights(learningRate * error / sum_sqr_dE_Dw)
+					}
 				}
 			}
 		},

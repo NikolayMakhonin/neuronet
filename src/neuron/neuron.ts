@@ -1,8 +1,8 @@
-import {INeuronFunc, TNeuronInput} from "./contracts";
+import {TNeuronFunc, TNeuronInput} from "./contracts";
 import {fixInfinity} from "./helpers";
 
 export class Neuron {
-	readonly func: INeuronFunc
+	readonly func: TNeuronFunc
 	readonly inputs: TNeuronInput
 	readonly weights: number[]
 	readonly dE_dw: number[]
@@ -11,7 +11,7 @@ export class Neuron {
 	output: number
 
 	constructor(
-		func: INeuronFunc,
+		func: TNeuronFunc,
 		inputs: Array<Neuron|number>,
 		weights: number[],
 	) {

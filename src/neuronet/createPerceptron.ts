@@ -1,4 +1,4 @@
-import {INeuronFunc} from "../neuron/contracts";
+import {TNeuronFunc} from "../neuron/contracts";
 import {Neuron} from "../neuron/neuron";
 import {TNeuroNet, TNeuroNetInput} from "./contracts";
 
@@ -13,7 +13,7 @@ export function createPerceptron<TInput extends TNeuroNetInput = TNeuroNetInput>
 	countLayers: number,
 	getLayerSize: (countLayers: number, layerIndex: number) => number,
 	getLinkWeight: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number, countLinks: number, linkIndex: number) => number,
-	getNeuronFunc: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number) => INeuronFunc,
+	getNeuronFunc: (countLayers: number, layerIndex: number, countNeurons: number, neuronIndex: number) => TNeuronFunc,
 }): TNeuroNet<TInput> {
 	const layers: Neuron[][] = []
 	let prevLayer: (Neuron|number)[] = input

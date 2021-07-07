@@ -1,6 +1,6 @@
 import {Neuron} from "./neuron";
 
-export interface INeuronFunc {
+export type TNeuronFunc = {
 	func: (input: number) => number
 	derivative: (input: number) => number
 }

@@ -1,4 +1,4 @@
-import {INeuronFunc} from "./contracts";
+import {TNeuronFunc} from "./contracts";
 
 export const funcs = {
 	x: {

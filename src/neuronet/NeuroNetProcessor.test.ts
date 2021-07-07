@@ -2,36 +2,72 @@ import assert from "assert";
 import {Neuron} from "../neuron/neuron";
 import {funcs} from "../neuron/funcs";
 import {NeuroNetProcessor} from "./NeuroNetProcessor";
+import {TNeuronFunc} from "../neuron/contracts";
 
 describe('NeuroNetProcessor', function() {
-	it('single neuron', function() {
+	function testSingleNeuron({
+		name,
+		learningRate,
+		maxIterations,
+		func,
+		maxError,
+	}: {
+		name: string,
+		learningRate: number,
+		maxIterations: number,
+		func: TNeuronFunc,
+		maxError: number,
+	}) {
 		const input = [0]
-		const neuron = new Neuron(funcs.sigmoid, input, [0])
+		const neuron = new Neuron(func, input, [0])
 		const neuroNet = new NeuroNetProcessor({
 			neuroNet: {
 				input,
 				layers: [[neuron]],
 			},
 			expectedFunc(input, output) {
-				output[0] = funcs.sigmoid.func(input[0])
+				output[0] = func.func(input[0])
 			},
 		})
 
 		neuroNet.learn({
 			nextInputValue(inputIndex, inputCount) {
-				return Math.random() * 5 - 10
+				return Math.random() * 10 - 5
 			},
-			learningRate: 0.1,
-			maxIterations: 100000,
+			learningRate,
+			maxIterations,
 		})
 
+		const calcErrorIterations = 1000
 		const error = neuroNet.calcError({
-			nextInputValue(inputIndex, inputCount) {
-				return (inputIndex / inputCount) * 10 - 5
+			nextInputValue(inputIndex, inputCount, iteration) {
+				return (iteration / calcErrorIterations) * 10 - 5
 			},
-			maxIterations: 1000,
+			maxIterations: calcErrorIterations,
 		})
 
-		console.log('error=' + error)
+		console.log(`Single neuron (${name}); error=${error}`)
+
+		assert.ok(error < maxError)
+	}
+
+	it('single neuron sigmoid', function() {
+		testSingleNeuron({
+			name: 'sigmoid',
+			learningRate: 0.1,
+			maxIterations: 150,
+			func: funcs.sigmoid,
+			maxError: 0.0001,
+		})
+	})
+
+	it('single neuron ReLU', function() {
+		testSingleNeuron({
+			name: 'ReLU',
+			learningRate: 0.1,
+			maxIterations: 400,
+			func: funcs.ReLU,
+			maxError: 0.0001,
+		})
 	})
 })

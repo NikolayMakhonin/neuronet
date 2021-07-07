@@ -8,7 +8,7 @@ export function learn<TInput, TOutput>({
 	maxIterations,
 	maxTime,
 }: {
-	nextInput: (prevInput: TInput) => TInput,
+	nextInput: (prevInput: TInput, iteration: number) => TInput,
 	func: (input: TInput) => TOutput,
 	expectedFunc: (input: TInput) => TOutput,
 	fixError: (input: TInput, output: TOutput, expectedOutput: TOutput) => boolean|void,
@@ -20,8 +20,8 @@ export function learn<TInput, TOutput>({
 	cycle({
 		maxIterations,
 		maxTime,
-		func() {
-			input = nextInput(input)
+		func(iteration) {
+			input = nextInput(input, iteration)
 			const output = func(input)
 			const expectedOutput = expectedFunc(input)
 			return fixError(input, output, expectedOutput)
