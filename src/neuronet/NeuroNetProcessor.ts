@@ -105,18 +105,24 @@ function _learnNeuroNet({
 			return expectedOutput
 		},
 		fixError(input, output, expectedOutput) {
-			for (let i = 0, len = output.length; i < len; i++) {
-				const neuron = lastLayer[i]
+			// see: https://www.youtube.com/watch?v=mG8A-k9cDiU
 
+			let error = 0 // результат функции ошибок
+			for (let i = 0, len = output.length; i < len; i++) {
 				const actual = output[i]
 				const expected = expectedOutput[i]
-				const error = (actual - expected) ** 2
+				error += (actual - expected) ** 2
+			}
 
-				errorSumSqr += error
-				errorCount++
+			errorSumSqr += error
+			errorCount++
 
-				if (learningRate) {
-					const dE_do_j = 2 * (actual - expected) * 1
+			if (learningRate) {
+				for (let i = 0, len = output.length; i < len; i++) {
+					const neuron = lastLayer[i]
+					const actual = output[i]
+					const expected = expectedOutput[i]
+					const dE_do_j = 2 * (actual - expected) // частная производная функции ошибок
 					neuron.clear_dE_Dw()
 					const sum_sqr_dE_Dw = neuron.calc_dE_Dw(dE_do_j)
 					if (sum_sqr_dE_Dw !== 0) {
