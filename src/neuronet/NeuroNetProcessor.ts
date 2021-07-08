@@ -25,7 +25,7 @@ export class NeuroNetProcessor {
 		maxIterations,
 		maxTime,
 	}: {
-		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
+		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number|null,
 		learningRate: number,
 		maxIterations?: number,
 		maxTime?: number,
@@ -45,7 +45,7 @@ export class NeuroNetProcessor {
 		maxIterations,
 		maxTime,
 	}: {
-		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
+		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number|null,
 		maxIterations?: number,
 		maxTime?: number,
 	}) {
@@ -68,7 +68,7 @@ function _learnNeuroNet({
 	maxTime,
 }: {
 	neuroNet: TNeuroNet<TInput>,
-	nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number,
+	nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number|null,
 	expectedFunc: (input: TInput, output: TOutput) => void,
 	learningRate?: number,
 	maxIterations?: number,
@@ -88,7 +88,10 @@ function _learnNeuroNet({
 				input = neuroNet.input
 			}
 			for (let i = 0, len = input.length; i < len; i++) {
-				input[i] = nextInputValue(i, len, iteration)
+				const newValue = nextInputValue(i, len, iteration)
+				if (newValue != null) {
+					input[i] = newValue
+				}
 			}
 			return input
 		},

@@ -12,7 +12,7 @@ describe('createPerceptron', function() {
 				return countLayers - layerIndex
 			},
 			getLinkWeight(countLayers, layerIndex, countNeurons, neuronIndex, countLinks, linkIndex) {
-				return layerIndex + neuronIndex + linkIndex + 1
+				return { value: layerIndex + neuronIndex + linkIndex + 1 }
 			},
 			getNeuronFunc(countLayers, layerIndex, countNeurons, neuronIndex) {
 				return _funcs[neuronIndex]

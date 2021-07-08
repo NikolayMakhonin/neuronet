@@ -5,6 +5,7 @@ export class Neuron {
 	readonly func: TNeuronFunc
 	readonly inputs: TNeuronInput
 	readonly weights: number[]
+	readonly fixedWeights: boolean[]
 	readonly dE_dw: number[]
 
 	input: number
@@ -14,10 +15,12 @@ export class Neuron {
 		func: TNeuronFunc,
 		inputs: Array<Neuron|number>,
 		weights: number[],
+		fixedWeights?: boolean[],
 	) {
 		this.func = func
 		this.inputs = inputs
 		this.weights = weights
+		this.fixedWeights = fixedWeights
 		this.dE_dw = []
 		for (let i = 0, len = inputs.length; i < len; i++) {
 			this.dE_dw[i] = 0
@@ -28,9 +31,6 @@ export class Neuron {
 		let sum = 0
 		for (let i = 0, len = this.weights.length; i < len; i++) {
 			let weight = this.weights[i]
-			if (weight == null) {
-				weight = 1
-			}
 			const input = this.inputs[i]
 			let inputValue: number
 			if (typeof input === 'number') {
@@ -69,10 +69,10 @@ export class Neuron {
 		const df_dSi = this.func.derivative(this.input)
 		let sum_sqr_dE_Dw = 0
 		for (let j = 0, len = this.weights.length; j < len; j++) {
-			const w_ij = this.weights[j]
-			if (w_ij == null) {
+			if (this.fixedWeights && this.fixedWeights[j]) {
 				continue
 			}
+			const w_ij = this.weights[j]
 			const input = this.inputs[j]
 			const xj = typeof input === 'number'
 				? input
@@ -95,10 +95,10 @@ export class Neuron {
 
 	changeWeights(learningRate: number) {
 		for (let i = 0, len = this.weights.length; i < len; i++) {
-			const weight = this.weights[i]
-			if (weight == null) {
+			if (this.fixedWeights && this.fixedWeights[i]) {
 				continue
 			}
+			const weight = this.weights[i]
 			this.weights[i] = fixInfinity(weight - learningRate * this.dE_dw[i])
 			const input = this.inputs[i]
 			if (typeof input !== 'number') {
