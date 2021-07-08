@@ -61,7 +61,7 @@ export class Neuron {
 	}
 
 	/**
-	 * @param dDk_dyj = 2 * (actual - expected) * learningRate
+	 * @param dDk_dyj = 2 * (actual - expected)
 	 * @return sum_sqr_dE_Dw
 	 */
 	calc_dE_Dw(dDk_dyj: number): number {
@@ -79,8 +79,9 @@ export class Neuron {
 				: input.output
 			const dyj_dwij = df_dSi * xj
 			const dEk_dwij = dDk_dyj * dyj_dwij
+			sum_sqr_dE_Dw -= this.dE_dw[j] * this.dE_dw[j]
 			this.dE_dw[j] += dEk_dwij
-			sum_sqr_dE_Dw += dEk_dwij * dEk_dwij
+			sum_sqr_dE_Dw += this.dE_dw[j] * this.dE_dw[j]
 			// if (dE_dw_ij !== 0) {
 			// 	this.weights[i] = fixInfinity(w_ij - dE_dw_ij)
 			// }

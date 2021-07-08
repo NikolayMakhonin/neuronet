@@ -113,25 +113,31 @@ function _learnNeuroNet({
 			// see: https://www.youtube.com/watch?v=W2LshGngCNw
 
 			let error = 0 // результат функции ошибок
-			for (let i = 0, len = output.length; i < len; i++) {
-				const actual = output[i]
+			for (let i = 0, len = lastLayer.length; i < len; i++) {
+				const neuron = lastLayer[i]
+				const actual = neuron.output
 				const expected = expectedOutput[i]
-				error += (actual - expected) ** 2
+				error += (actual - expected) ** 2 // функция ошибок
 			}
 
 			errorSumSqr += error
 			errorCount++
 
 			if (learningRate) {
-				for (let i = 0, len = output.length; i < len; i++) {
+				let sum_sqr_dE_Dw = 0
+				for (let i = 0, len = lastLayer.length; i < len; i++) {
 					const neuron = lastLayer[i]
-					const yi = output[i]
+					const yi = neuron.output
 					const ai = expectedOutput[i]
-					const dDk_dyj = 2 * (yi - ai) // частная производная функции ошибок
+					const dDk_dyj = 2 * (yi - ai) // часть производной функции ошибок
 					neuron.clear_dE_Dw()
-					const sum_sqr_dE_Dw = neuron.calc_dE_Dw(dDk_dyj)
-					if (sum_sqr_dE_Dw !== 0) {
-						neuron.changeWeights(learningRate * Math.sqrt(error / sum_sqr_dE_Dw))
+					sum_sqr_dE_Dw += neuron.calc_dE_Dw(dDk_dyj)
+				}
+				if (sum_sqr_dE_Dw !== 0) {
+					const dw = learningRate * Math.sqrt(error / sum_sqr_dE_Dw)
+					for (let i = 0, len = lastLayer.length; i < len; i++) {
+						const neuron = lastLayer[i]
+						neuron.changeWeights(dw)
 					}
 				}
 			}
