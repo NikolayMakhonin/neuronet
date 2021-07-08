@@ -1,5 +1,5 @@
 import {TNeuronFunc} from "../neuron/contracts";
-import {Neuron} from "../neuron/neuron";
+import {Neuron} from "../neuron/Neuron";
 import {TNeuroNet, TNeuroNetInput} from "./contracts";
 
 export function createPerceptron<TInput extends TNeuroNetInput = TNeuroNetInput>({

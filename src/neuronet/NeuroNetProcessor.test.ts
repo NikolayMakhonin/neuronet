@@ -1,5 +1,5 @@
 import assert from "assert";
-import {Neuron} from "../neuron/neuron";
+import {Neuron} from "../neuron/Neuron";
 import {funcs} from "../neuron/funcs";
 import {NeuroNetProcessor} from "./NeuroNetProcessor";
 import {TNeuronFunc} from "../neuron/contracts";
@@ -10,6 +10,7 @@ describe('NeuroNetProcessor', function() {
 		learningRate,
 		maxIterations,
 		func,
+		minError,
 		maxError,
 		testsCount,
 	}: {
@@ -17,6 +18,7 @@ describe('NeuroNetProcessor', function() {
 		learningRate: number,
 		maxIterations: number,
 		func: TNeuronFunc,
+		minError: number,
 		maxError: number,
 		testsCount: number,
 	}) {
@@ -54,8 +56,10 @@ describe('NeuroNetProcessor', function() {
 				testMaxError = error
 			}
 
-			assert.ok(error < maxError, `Single neuron (${name}); error=${error}`)
+			assert.ok(error <= maxError, `Single neuron (${name}); error=${error}`)
 		}
+
+		assert.ok(testMaxError >= minError, `Single neuron (${name}); error=${testMaxError}`)
 
 		console.log(`Single neuron (${name}); error=${testMaxError}`)
 	}
@@ -63,9 +67,10 @@ describe('NeuroNetProcessor', function() {
 	it('single neuron sigmoid', function() {
 		testSingleNeuron({
 			name: 'sigmoid',
-			learningRate: 0.1,
-			maxIterations: 150,
+			learningRate: 0.5,
+			maxIterations: 100,
 			func: funcs.sigmoid,
+			minError: 0.000001,
 			maxError: 0.0001,
 			testsCount: 1000,
 		})
@@ -74,9 +79,10 @@ describe('NeuroNetProcessor', function() {
 	it('single neuron ReLU', function() {
 		testSingleNeuron({
 			name: 'ReLU',
-			learningRate: 0.1,
-			maxIterations: 450,
+			learningRate: 0.5,
+			maxIterations: 100,
 			func: funcs.ReLU,
+			minError: 1e-20,
 			maxError: 0.0001,
 			testsCount: 1000,
 		})
@@ -85,11 +91,12 @@ describe('NeuroNetProcessor', function() {
 	xit('single neuron sin', function() {
 		testSingleNeuron({
 			name: 'sin',
-			learningRate: 0.01,
-			maxIterations: 30000,
+			learningRate: 0.1,
+			maxIterations: 2000,
 			func: funcs.sin,
+			minError: 0,
 			maxError: 0.0001,
-			testsCount: 1000,
+			testsCount: 10000,
 		})
 	})
 })

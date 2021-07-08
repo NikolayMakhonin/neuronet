@@ -1,3 +1,3 @@
-import {_test} from "./neuron/neuron";
+import {_test} from "./neuron/Neuron";
 
 _test('Worked')

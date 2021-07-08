@@ -1,5 +1,5 @@
 import assert from "assert";
-import {Neuron} from "./neuron";
+import {Neuron} from "./Neuron";
 import {funcs} from "./funcs";
 
 describe('Neuron', function() {

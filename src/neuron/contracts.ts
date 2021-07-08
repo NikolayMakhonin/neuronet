@@ -1,4 +1,4 @@
-import {Neuron} from "./neuron";
+import {Neuron} from "./Neuron";
 
 export type TNeuronFunc = {
 	func: (input: number) => number

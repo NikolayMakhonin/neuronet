@@ -61,31 +61,32 @@ export class Neuron {
 	}
 
 	/**
-	 * @param dE_do_j = 2 * (actual - expected) * learningRate
+	 * @param dDk_dyj = 2 * (actual - expected) * learningRate
 	 * @return sum_sqr_dE_Dw
 	 */
-	calc_dE_Dw(dE_do_j: number): number {
-		dE_do_j = fixInfinity(dE_do_j)
-		const dF_dS_j = this.func.derivative(this.input)
+	calc_dE_Dw(dDk_dyj: number): number {
+		dDk_dyj = fixInfinity(dDk_dyj)
+		const df_dSi = this.func.derivative(this.input)
 		let sum_sqr_dE_Dw = 0
-		for (let i = 0, len = this.weights.length; i < len; i++) {
-			const w_ij = this.weights[i]
+		for (let j = 0, len = this.weights.length; j < len; j++) {
+			const w_ij = this.weights[j]
 			if (w_ij == null) {
 				continue
 			}
-			const input = this.inputs[i]
-			const o_i = typeof input === 'number'
+			const input = this.inputs[j]
+			const xj = typeof input === 'number'
 				? input
 				: input.output
-			const dE_dw_ij = dE_do_j * dF_dS_j * o_i
-			this.dE_dw[i] += dE_dw_ij
-			sum_sqr_dE_Dw += dE_dw_ij * dE_dw_ij
+			const dyj_dwij = df_dSi * xj
+			const dEk_dwij = dDk_dyj * dyj_dwij
+			this.dE_dw[j] += dEk_dwij
+			sum_sqr_dE_Dw += dEk_dwij * dEk_dwij
 			// if (dE_dw_ij !== 0) {
 			// 	this.weights[i] = fixInfinity(w_ij - dE_dw_ij)
 			// }
 			if (typeof input !== 'number') {
-				const dE_do_i = dE_do_j * dF_dS_j * w_ij
-				sum_sqr_dE_Dw += input.calc_dE_Dw(dE_do_i)
+				const dDk_dxj = dEk_dwij * w_ij
+				sum_sqr_dE_Dw += input.calc_dE_Dw(dDk_dxj)
 			}
 		}
 

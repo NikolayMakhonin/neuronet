@@ -1,4 +1,4 @@
-import {Neuron} from "../neuron/neuron";
+import {Neuron} from "../neuron/Neuron";
 import {TNeuronInput} from "../neuron/contracts";
 
 export type TNeuroNet<TInput extends (Neuron|number)[] = (Neuron|number)[]> = {
