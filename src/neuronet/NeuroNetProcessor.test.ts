@@ -18,6 +18,7 @@ describe('NeuroNetProcessor', function() {
 		minError,
 		maxError,
 		testsCount,
+		countPerInput,
 	}: {
 		name: string,
 		neuroNet: NeuroNetProcessor,
@@ -28,17 +29,21 @@ describe('NeuroNetProcessor', function() {
 		minError: number,
 		maxError: number,
 		testsCount: number,
+		countPerInput: number,
 	}) {
 		let testMaxError = 0
-
 		for (let i = 0; i < testsCount; i++) {
-
 			neuroNet.learn({
-				nextInputValue(inputIndex, inputCount) {
+				nextInputValue(inputIndex, inputCount, iteration) {
 					if (inputIsFixed && inputIsFixed(inputIndex, inputCount)) {
 						return null
 					}
-					return Math.random() * (valueRange[1] - valueRange[0]) + valueRange[0]
+
+					if (!countPerInput || iteration % countPerInput === 0) {
+						return Math.random() * (valueRange[1] - valueRange[0]) + valueRange[0]
+					}
+
+					return null
 				},
 				learningRate,
 				maxIterations,
@@ -85,12 +90,13 @@ describe('NeuroNetProcessor', function() {
 			test({
 				name: 'sigmoid',
 				neuroNet: createSingleNeuron(funcs.sigmoid),
-				learningRate: 0.5,
-				maxIterations: 100,
+				learningRate: 10,
+				maxIterations: 15,
 				valueRange: [-5, 5],
-				minError: 0.000001,
+				minError: 0,
 				maxError: 0.0001,
-				testsCount: 1000,
+				testsCount: 10000,
+				countPerInput: 1,
 			})
 		})
 
@@ -104,6 +110,7 @@ describe('NeuroNetProcessor', function() {
 				minError: 0,
 				maxError: 0.0001,
 				testsCount: 1000,
+				countPerInput: 1,
 			})
 		})
 	})
@@ -184,6 +191,7 @@ describe('NeuroNetProcessor', function() {
 				minError: 0,
 				maxError: 0.0001,
 				testsCount: 1000,
+				countPerInput: 1,
 			})
 		})
 
@@ -203,6 +211,7 @@ describe('NeuroNetProcessor', function() {
 				minError: 0,
 				maxError: 0.0001,
 				testsCount: 1000,
+				countPerInput: 1,
 			})
 		})
 
@@ -224,6 +233,7 @@ describe('NeuroNetProcessor', function() {
 				minError: 0,
 				maxError: 0.0001,
 				testsCount: 1000,
+				countPerInput: 1,
 			})
 		})
 
@@ -242,11 +252,12 @@ describe('NeuroNetProcessor', function() {
 				}),
 				inputIsFixed: (index) => index === 1,
 				learningRate: 0.1,
-				maxIterations: 560,
+				maxIterations: 600,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
 				testsCount: 1000,
+				countPerInput: 1,
 			})
 		})
 	})
