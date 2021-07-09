@@ -23,11 +23,13 @@ export class NeuroNetProcessor {
 	learn({
 		nextInputValue,
 		learningRate,
+		momentRate,
 		maxIterations,
 		maxTime,
 	}: {
 		nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number|null,
 		learningRate: number,
+		momentRate?: number,
 		maxIterations?: number,
 		maxTime?: number,
 	}) {
@@ -36,6 +38,7 @@ export class NeuroNetProcessor {
 			nextInputValue,
 			expectedFunc: this.expectedFunc,
 			learningRate,
+			momentRate,
 			maxIterations,
 			maxTime,
 		})
@@ -65,6 +68,7 @@ function _learnNeuroNet({
 	nextInputValue,
 	expectedFunc,
 	learningRate,
+	momentRate,
 	maxIterations,
 	maxTime,
 }: {
@@ -72,6 +76,7 @@ function _learnNeuroNet({
 	nextInputValue: (inputIndex: number, inputCount: number, iteration: number) => number|null,
 	expectedFunc: (input: TInput, output: TOutput) => void,
 	learningRate?: number,
+	momentRate?: number,
 	maxIterations?: number,
 	maxTime?: number,
 }): number {
@@ -131,7 +136,7 @@ function _learnNeuroNet({
 				const sum_sqr_dE_Dw = calcSumSqr_dE_Dw(neuroNet.layers)
 				if (sum_sqr_dE_Dw !== 0) {
 					const dw = learningRate * Math.sqrt(error / sum_sqr_dE_Dw)
-					changeWeights(neuroNet.layers, dw)
+					changeWeights(neuroNet.layers, dw, momentRate)
 				}
 			}
 		},

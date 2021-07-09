@@ -10,8 +10,9 @@ describe('NeuroNetProcessor', function() {
 
 	function test({
 		name,
-		neuroNet,
+		createNeuroNet,
 		learningRate,
+		momentRate,
 		maxIterations,
 		valueRange,
 		inputIsFixed,
@@ -21,8 +22,9 @@ describe('NeuroNetProcessor', function() {
 		countPerInput,
 	}: {
 		name: string,
-		neuroNet: NeuroNetProcessor,
+		createNeuroNet: () => NeuroNetProcessor,
 		learningRate: number,
+		momentRate: number,
 		maxIterations: number,
 		valueRange: [number, number],
 		inputIsFixed?: (inputIndex, inputCount) => boolean,
@@ -33,6 +35,7 @@ describe('NeuroNetProcessor', function() {
 	}) {
 		let testMaxError = 0
 		for (let i = 0; i < testsCount; i++) {
+			const neuroNet = createNeuroNet()
 			neuroNet.learn({
 				nextInputValue(inputIndex, inputCount, iteration) {
 					if (inputIsFixed && inputIsFixed(inputIndex, inputCount)) {
@@ -46,6 +49,7 @@ describe('NeuroNetProcessor', function() {
 					return null
 				},
 				learningRate,
+				momentRate,
 				maxIterations,
 			})
 
@@ -63,12 +67,12 @@ describe('NeuroNetProcessor', function() {
 				testMaxError = error
 			}
 
-			assert.ok(error <= maxError, `Single neuron (${name}); error=${error}`)
+			assert.ok(error <= maxError, `Single neuron (${name})\r\nerror=${error}`)
 		}
 
-		assert.ok(testMaxError >= minError, `Single neuron (${name}); error=${testMaxError}`)
+		assert.ok(testMaxError >= minError, `Single neuron (${name})\r\nerror=${testMaxError}`)
 
-		console.log(`Single neuron (${name}); error=${testMaxError}`)
+		console.log(`Single neuron (${name})\r\nerror=${testMaxError}`)
 	}
 
 	function createSingleNeuron(func: TNeuronFunc) {
@@ -89,9 +93,10 @@ describe('NeuroNetProcessor', function() {
 		it('sigmoid', function () {
 			test({
 				name: 'sigmoid',
-				neuroNet: createSingleNeuron(funcs.sigmoid),
-				learningRate: 10,
-				maxIterations: 20,
+				createNeuroNet: () => createSingleNeuron(funcs.sigmoid),
+				learningRate: 1,
+				momentRate: 0.4,
+				maxIterations: 30,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
@@ -103,9 +108,10 @@ describe('NeuroNetProcessor', function() {
 		it('single neuron ReLU', function () {
 			test({
 				name: 'ReLU',
-				neuroNet: createSingleNeuron(funcs.ReLU),
+				createNeuroNet: () => createSingleNeuron(funcs.ReLU),
 				learningRate: 0.5,
-				maxIterations: 100,
+				momentRate: 0, // 1e-300,
+				maxIterations: 90,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
@@ -179,14 +185,15 @@ describe('NeuroNetProcessor', function() {
 		it('freqs[1]', function () {
 			test({
 				name: 'fourier[1]',
-				neuroNet: createFourier({
+				createNeuroNet: () => createFourier({
 					freqs: [1],
 					startWeights: [0],
 					expectedFunc: o => Math.sin(o),
 				}),
 				inputIsFixed: (index) => index === 1,
-				learningRate: 0.1,
-				maxIterations: 200,
+				learningRate: 1,
+				momentRate: 0,
+				maxIterations: 15,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
@@ -198,19 +205,20 @@ describe('NeuroNetProcessor', function() {
 		it('freqs[1] with phase', function () {
 			test({
 				name: 'fourier[1] with phase',
-				neuroNet: createFourier({
+				createNeuroNet: () => createFourier({
 					freqs: [1],
 					startWeights: [0, 0],
 					expectedFunc: o => Math.sin(o) + Math.sin(o + Math.PI / 2),
 					considerPhase: true,
 				}),
 				inputIsFixed: (index) => index === 1,
-				learningRate: 0.1,
-				maxIterations: 200,
+				learningRate: 1,
+				momentRate: 0,
+				maxIterations: 40,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 1000,
+				testsCount: 10000,
 				countPerInput: 1,
 			})
 		})
@@ -218,7 +226,7 @@ describe('NeuroNetProcessor', function() {
 		it('freqs[1,2] with phase', function () {
 			test({
 				name: 'fourier[1,2] with phase',
-				neuroNet: createFourier({
+				createNeuroNet: () => createFourier({
 					freqs: [1, 2],
 					startWeights: [0, 0, 0, 0],
 					expectedFunc: o =>
@@ -227,12 +235,13 @@ describe('NeuroNetProcessor', function() {
 					considerPhase: true,
 				}),
 				inputIsFixed: (index) => index === 1,
-				learningRate: 0.1,
-				maxIterations: 360,
+				learningRate: 1,
+				momentRate: 0,
+				maxIterations: 120,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 1000,
+				testsCount: 10000,
 				countPerInput: 1,
 			})
 		})
@@ -240,7 +249,7 @@ describe('NeuroNetProcessor', function() {
 		it('freqs[1,2,3,4] with phase', function () {
 			test({
 				name: 'fourier[1,2,3,4] with phase',
-				neuroNet: createFourier({
+				createNeuroNet: () => createFourier({
 					freqs: [1, 2, 3, 4],
 					startWeights: [0, 0, 0, 0, 0, 0, 0, 0],
 					expectedFunc: o =>
@@ -251,12 +260,13 @@ describe('NeuroNetProcessor', function() {
 					considerPhase: true,
 				}),
 				inputIsFixed: (index) => index === 1,
-				learningRate: 0.1,
-				maxIterations: 600,
+				learningRate: 0.5,
+				momentRate: 0,
+				maxIterations: 250,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 1000,
+				testsCount: 10000,
 				countPerInput: 1,
 			})
 		})
