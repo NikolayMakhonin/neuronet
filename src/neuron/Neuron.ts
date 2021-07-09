@@ -5,6 +5,7 @@ export class Neuron {
 	readonly func: TNeuronFunc
 	readonly inputs: TNeuronInput
 	readonly weights: number[]
+	readonly prevWeights: number[]
 	readonly fixedWeights: boolean[]
 	readonly dE_dw: number[]
 
@@ -22,8 +23,19 @@ export class Neuron {
 		this.weights = weights
 		this.fixedWeights = fixedWeights
 		this.dE_dw = []
-		for (let i = 0, len = inputs.length; i < len; i++) {
+		this.prevWeights = []
+		const len = inputs.length
+
+		if (this.weights.length !== len) {
+			throw new Error(`weights.length (${this.weights.length}) !== input.length (${len})`)
+		}
+		if (this.fixedWeights && this.fixedWeights.length !== len) {
+			throw new Error(`fixedWeights.length (${this.fixedWeights.length}) !== input.length (${len})`)
+		}
+
+		for (let i = 0; i < len; i++) {
 			this.dE_dw[i] = 0
+			this.prevWeights[i] = this.weights[i]
 		}
 	}
 
@@ -53,10 +65,6 @@ export class Neuron {
 	clear_dE_Dw(): void {
 		for (let i = 0, len = this.weights.length; i < len; i++) {
 			this.dE_dw[i] = 0
-			const input = this.inputs[i]
-			if (typeof input !== 'number') {
-				input.clear_dE_Dw()
-			}
 		}
 	}
 
@@ -94,17 +102,29 @@ export class Neuron {
 		return fixInfinity(sum_sqr_dE_Dw)
 	}
 
-	changeWeights(learningRate: number) {
+	calcSumSqr_dE_Dw() {
+		let sum_sqr_dE_Dw = 0
+		for (let j = 0, len = this.weights.length; j < len; j++) {
+			sum_sqr_dE_Dw += this.dE_dw[j] * this.dE_dw[j]
+		}
+		return sum_sqr_dE_Dw
+	}
+
+	changeWeights(dw: number, momentRate?: number) {
 		for (let i = 0, len = this.weights.length; i < len; i++) {
 			if (this.fixedWeights && this.fixedWeights[i]) {
 				continue
 			}
-			const weight = this.weights[i]
-			this.weights[i] = fixInfinity(weight - learningRate * this.dE_dw[i])
-			const input = this.inputs[i]
-			if (typeof input !== 'number') {
-				input.changeWeights(learningRate)
+			let weight = this.weights[i]
+			const prevDw = this.weights[i] - this.prevWeights[i]
+			this.prevWeights[i] = weight
+
+			weight = weight - dw * this.dE_dw[i]
+			if (momentRate) {
+				weight += momentRate * prevDw
 			}
+
+			this.weights[i] = fixInfinity(weight)
 		}
 	}
 }

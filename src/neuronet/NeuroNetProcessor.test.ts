@@ -91,11 +91,11 @@ describe('NeuroNetProcessor', function() {
 				name: 'sigmoid',
 				neuroNet: createSingleNeuron(funcs.sigmoid),
 				learningRate: 10,
-				maxIterations: 15,
+				maxIterations: 20,
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 10000,
+				testsCount: 1000,
 				countPerInput: 1,
 			})
 		})

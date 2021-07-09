@@ -1,5 +1,6 @@
 import {learn} from "../learning/learn";
 import {TNeuroNet} from "./contracts";
+import {Neuron} from '../neuron/Neuron'
 
 type TInput = number[]
 type TOutput = number[]
@@ -112,37 +113,76 @@ function _learnNeuroNet({
 			// see: https://www.youtube.com/watch?v=87gux0d36bw
 			// see: https://www.youtube.com/watch?v=W2LshGngCNw
 
-			let error = 0 // результат функции ошибок
-			for (let i = 0, len = lastLayer.length; i < len; i++) {
-				const neuron = lastLayer[i]
-				const actual = neuron.output
-				const expected = expectedOutput[i]
-				error += (actual - expected) ** 2 // функция ошибок
-			}
+			const error = calcError(output, expectedOutput)
 
 			errorSumSqr += error
 			errorCount++
 
 			if (learningRate) {
-				let sum_sqr_dE_Dw = 0
+				clear_dE_Dw(neuroNet.layers)
 				for (let i = 0, len = lastLayer.length; i < len; i++) {
 					const neuron = lastLayer[i]
 					const yi = neuron.output
 					const ai = expectedOutput[i]
 					const dDk_dyj = 2 * (yi - ai) // часть производной функции ошибок
-					neuron.clear_dE_Dw()
-					sum_sqr_dE_Dw += neuron.calc_dE_Dw(dDk_dyj)
+					neuron.calc_dE_Dw(dDk_dyj)
 				}
+
+				const sum_sqr_dE_Dw = calcSumSqr_dE_Dw(neuroNet.layers)
 				if (sum_sqr_dE_Dw !== 0) {
 					const dw = learningRate * Math.sqrt(error / sum_sqr_dE_Dw)
-					for (let i = 0, len = lastLayer.length; i < len; i++) {
-						const neuron = lastLayer[i]
-						neuron.changeWeights(dw)
-					}
+					changeWeights(neuroNet.layers, dw)
 				}
 			}
 		},
 	})
 
 	return errorSumSqr
+}
+
+function perceptronForEach(
+	layers: Neuron[][],
+	func: (neuron: Neuron, layerIndex: number, neuronIndex: number, layers: Neuron[][]) => void,
+) {
+	for (let layerIndex = 0, layersLength = layers.length; layerIndex < layersLength; layerIndex++) {
+		const neurons = layers[layerIndex]
+		for (let neuronIndex = 0, neuronLength = neurons.length; neuronIndex < neuronLength; neuronIndex++) {
+			const neuron = neurons[neuronIndex]
+			func(neuron, layerIndex, neuronIndex, layers)
+		}
+	}
+}
+
+// функция ошибок (сумма квадратов разности)
+function calcError(actualOutput: (Neuron|number)[], expectedOutput: number[]) {
+	let error = 0
+	for (let i = 0, len = actualOutput.length; i < len; i++) {
+		let actual = actualOutput[i]
+		if (typeof actual !== 'number') {
+			actual = actual.output
+		}
+		const expected = expectedOutput[i]
+		error += (actual - expected) ** 2
+	}
+	return error
+}
+
+function clear_dE_Dw(layers: Neuron[][]) {
+	perceptronForEach(layers, neuron => {
+		neuron.clear_dE_Dw()
+	})
+}
+
+function calcSumSqr_dE_Dw(layers: Neuron[][]) {
+	let sum_sqr_dE_Dw = 0
+	perceptronForEach(layers, neuron => {
+		sum_sqr_dE_Dw += neuron.calcSumSqr_dE_Dw()
+	})
+	return sum_sqr_dE_Dw
+}
+
+function changeWeights(layers: Neuron[][], dw: number, momentRate?: number) {
+	perceptronForEach(layers, neuron => {
+		neuron.changeWeights(dw, momentRate)
+	})
 }
