@@ -218,7 +218,7 @@ describe('NeuroNetProcessor', function() {
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 10000,
+				testsCount: 1000,
 				countPerInput: 1,
 			})
 		})
@@ -241,7 +241,7 @@ describe('NeuroNetProcessor', function() {
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 10000,
+				testsCount: 1000,
 				countPerInput: 1,
 			})
 		})
@@ -266,7 +266,7 @@ describe('NeuroNetProcessor', function() {
 				valueRange: [-5, 5],
 				minError: 0,
 				maxError: 0.0001,
-				testsCount: 10000,
+				testsCount: 1000,
 				countPerInput: 1,
 			})
 		})
